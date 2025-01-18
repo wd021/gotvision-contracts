@@ -49,7 +49,7 @@ contract GotVision is Ownable, ReentrancyGuard, Pausable {
     IPermit2 public immutable permit2;
 
     // Events with timestamps
-    event Deposited(address indexed user, uint256 amount, uint256 timestamp);
+    event Deposited(address indexed user, uint256 amount, string userId, uint256 timestamp);
     event Withdrawn(address indexed user, uint256 amount, uint256 timestamp);
     
     // Constructor sets the WLD token address and owner
@@ -64,11 +64,13 @@ contract GotVision is Ownable, ReentrancyGuard, Pausable {
      * @param amount The amount of WLD tokens to deposit
      * @param permit The Permit2 permission structure
      * @param signature The signature for the Permit2 transfer
+     * @param userId The user's identification string
      */
     function deposit(
         uint256 amount,
         IPermit2.PermitTransferFrom calldata permit,
-        bytes calldata signature
+        bytes calldata signature,
+        string calldata userId
     ) external whenNotPaused nonReentrant {
         require(amount > 0, "Amount must be greater than 0");
         require(permit.permitted.amount >= amount, "Insufficient permit amount");
@@ -84,8 +86,8 @@ contract GotVision is Ownable, ReentrancyGuard, Pausable {
             signature
         );
         
-        // Emit deposit event with current timestamp
-        emit Deposited(msg.sender, amount, block.timestamp);
+        // Emit deposit event with userId and current timestamp
+        emit Deposited(msg.sender, amount, userId, block.timestamp);
     }
     
     /**
